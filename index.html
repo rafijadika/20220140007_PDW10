@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pendaftaran</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background-image 0.5s ease-in-out;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            padding: 20px;
+        }
+        .form-container, .result-container {
+            display: none;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
+        .navigation {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 16px;
+        }
+        .navigation button:hover {
+            background-color: #0056b3;
+        }
+        .result-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .delete-button {
+            padding: 5px 10px;
+            background-color: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .delete-button:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2 style="text-align: center; padding: 20px 0; margin: 0; background: #007BFF; color: white;">Form Pendaftaran</h2>
+        <div class="form-container" id="formContainer">
+            <form id="registrationForm">
+                <div class="form-group">
+                    <label for="nama">Nama:</label>
+                    <input type="text" id="nama" name="nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="nim">NIM:</label>
+                    <input type="text" id="nim" name="nim" required>
+                </div>
+                <div class="form-group">
+                    <label for="peminatan">Peminatan:</label>
+                    <select id="peminatan" name="peminatan" required>
+                        <option value="">--Pilih Peminatan--</option>
+                        <option value="Teknik Informatika">Teknik Informatika</option>
+                        <option value="Sistem Informasi">Sistem Informasi</option>
+                        <option value="Manajemen Informatika">Manajemen Informatika</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tanggalLahir">Tanggal Lahir:</label>
+                    <input type="date" id="tanggalLahir" name="tanggalLahir" required>
+                </div>
+                <div class="form-group">
+                    <label for="hobi">Hobi:</label>
+                    <input type="text" id="hobi" name="hobi">
+                </div>
+                <div class="form-group">
+                    <label for="alamat">Alamat:</label>
+                    <textarea id="alamat" name="alamat" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit">Daftar</button>
+                </div>
+            </form>
+        </div>
+        <div class="result-container" id="resultContainer">
+            <div id="results"></div>
+        </div>
+        <div class="navigation">
+            <button id="showFormButton">Isi Form Pendaftaran</button>
+            <button id="showResultButton">Cek Hasil Pendaftaran</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formContainer = document.getElementById('formContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const showFormButton = document.getElementById('showFormButton');
+            const showResultButton = document.getElementById('showResultButton');
+            const results = document.getElementById('results');
+
+            showFormButton.addEventListener('click', function() {
+                formContainer.style.display = 'block';
+                resultContainer.style.display = 'none';
+            });
+
+            showResultButton.addEventListener('click', function() {
+                const formDataArray = JSON.parse(localStorage.getItem('formDataArray')) || [];
+                if (formDataArray.length > 0) {
+                    results.innerHTML = formDataArray.map((formData, index) => `
+                        <div class="result-item">
+                            <h3>Data Pendaftaran ${index + 1}</h3>
+                            <p>Nama: ${formData.nama}</p>
+                            <p>NIM: ${formData.nim}</p>
+                            <p>Peminatan: ${formData.peminatan}</p>
+                            <p>Tanggal Lahir: ${formData.tanggalLahir}</p>
+                            <p>Hobi: ${formData.hobi}</p>
+                            <p>Alamat: ${formData.alamat}</p>
+                            <button class="delete-button" data-index="${index}">Hapus</button>
+                        </div>
+                    `).join('');
+                    document.querySelectorAll('.delete-button').forEach(button => {
+                        button.addEventListener('click', function() {
+                            const index = this.getAttribute('data-index');
+                            formDataArray.splice(index, 1);
+                            localStorage.setItem('formDataArray', JSON.stringify(formDataArray));
+                            showResultButton.click();
+                        });
+                    });
+                } else {
+                    results.innerHTML = '<p>Data pendaftaran tidak ditemukan.</p>';
+                }
+                formContainer.style.display = 'none';
+                resultContainer.style.display = 'block';
+            });
+
+            document.getElementById('registrationForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = {
+                    nama: document.getElementById('nama').value,
+                    nim: document.getElementById('nim').value,
+                    peminatan: document.getElementById('peminatan').value,
+                    tanggalLahir: document.getElementById('tanggalLahir').value,
+                    hobi: document.getElementById('hobi').value,
+                    alamat: document.getElementById('alamat').value
+                };
+
+                let formDataArray = JSON.parse(localStorage.getItem('formDataArray')) || [];
+                formDataArray.push(formData);
+                localStorage.setItem('formDataArray', JSON.stringify(formDataArray));
+
+                console.log('Data Pendaftaran:', formData);
+
+                alert('Pendaftaran berhasil!');
+                formContainer.style.display = 'none';
+            });
+
+            // Set background image programmatically
+            document.body.style.backgroundImage = "url('https://cdn-fieah.nitrocdn.com/gPcagixaUBxZFGSNjoZhotFrtQtDJGWz/assets/images/optimized/rev-22d07d8/scholarly.co/wp-content/uploads/2022/10/t.jpg')";
+
+            // Initially display the form
+            formContainer.style.display = 'block';
+        });
+    </script>
+
+</body>
+</html>
